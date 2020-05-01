@@ -46,6 +46,23 @@ public class Navigation extends Subsystem {
                 drive.frontRight, localization, driveConstants);
         subsystems.add(drive);
         constraints = new MecanumConstraints(BASE_CONSTRAINTS, driveConstants.TRACK_WIDTH);
+
+        followSM = new StateMachine<Trajectory>("FollowTrajectory");
+        followSM.once((state, trajectory) -> {
+            follower.followTrajectory(trajectory);
+        });
+        followSM.repeat((state, trajectory) -> {
+            if (!follower.isFollowing())
+                state.next();
+            else {
+                currentPose = driveBase.getPoseEstimate();
+                driveBase.setDriveSignal(follower.update(currentPose));
+                lastError = follower.getLastError();
+            }
+        });
+        followSM.once((state, trajectory) -> {
+            driveBase.setDriveSignal(new DriveSignal());
+        });
     }
 
     @Override
@@ -61,20 +78,7 @@ public class Navigation extends Subsystem {
         drive.move(forward, turn, strafe);
     }
 
-    private StateMachine<Trajectory> followTrajectorySM = new StateMachine<Trajectory>("FollowTrajectory")
-        .once((state, trajectory) -> {
-            follower.followTrajectory(trajectory);
-        }).repeat((state, trajectory) -> {
-            if (!follower.isFollowing())
-                state.transition();
-            else {
-                currentPose = driveBase.getPoseEstimate();
-                driveBase.setDriveSignal(follower.update(currentPose));
-                lastError = follower.getLastError();
-            }
-        }).once((state, trajectory) -> {
-            driveBase.setDriveSignal(new DriveSignal());
-        });
+    private StateMachine<Trajectory> followSM;
 
     public TrajectoryBuilder trajectoryBuilder(double maxVel) {
         return trajectoryBuilder(new MecanumConstraints(new DriveConstraints(
@@ -92,7 +96,7 @@ public class Navigation extends Subsystem {
     }
 
     public void followTrajectory(Trajectory trajectory) {
-        runSM(followTrajectorySM, trajectory);
+        runSM(followSM, trajectory);
     }
 
     public void setPoseEstimate(Pose2d pose) {
