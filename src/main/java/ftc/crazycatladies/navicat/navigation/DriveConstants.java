@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 public class DriveConstants {
     final MotorConfigurationType MOTOR_CONFIG =
             MotorConfigurationType.getMotorType(NeveRest20Gearmotor.class);
-    public final PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(15.0, 0.0, 0.0);
+    public PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(15.0, 0.0, 0.0);
     public final boolean RUN_USING_ENCODER = true;
     public double WHEEL_RADIUS;
     public double GEAR_RATIO; // output (wheel) speed / input (motor) speed
@@ -22,13 +22,15 @@ public class DriveConstants {
         this.TRACK_WIDTH = TRACK_WIDTH;
     }
 
-    public DriveConstants(double WHEEL_RADIUS, double GEAR_RATIO, double kV, double kA, double kStatic, double TRACK_WIDTH) {
+    public DriveConstants(double WHEEL_RADIUS, double GEAR_RATIO, double kV, double kA, double kStatic,
+                          double TRACK_WIDTH, PIDCoefficients MOTOR_VELO_PID) {
         this.WHEEL_RADIUS = WHEEL_RADIUS;
         this.GEAR_RATIO = GEAR_RATIO;
         this.kV = kV;
         this.kA = kA;
         this.kStatic = kStatic;
         this.TRACK_WIDTH = TRACK_WIDTH;
+        this.MOTOR_VELO_PID = MOTOR_VELO_PID;
     }
 
     public double rpmToVelocity(double rpm) {
