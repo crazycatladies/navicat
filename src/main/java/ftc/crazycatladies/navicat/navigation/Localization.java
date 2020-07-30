@@ -31,7 +31,10 @@ public class Localization extends Subsystem {
         super.init(hwMap, time);
 
         BNO055IMU imu1 = hwMap.get(BNO055IMU.class, this.imu1);
-        BNO055IMU imu2 = hwMap.get(BNO055IMU.class, this.imu2);
+        BNO055IMU imu2 = null;
+
+        if (this.imu2 != null)
+            imu2 = hwMap.get(BNO055IMU.class, this.imu2);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
@@ -39,7 +42,7 @@ public class Localization extends Subsystem {
         RobotLog.i("initializing imu ->");
         if (imu1.initialize(parameters)) {
             imu = imu1;
-        } else {
+        } else if (imu2 != null) {
             imu2.initialize(parameters);
             imu = imu2;
         }

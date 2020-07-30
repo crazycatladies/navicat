@@ -23,9 +23,9 @@ repositories {
 dependencies {
     implementation files('libs/RobotCore.jar')
     implementation files('libs/Hardware.jar')
-    implementation 'com.acmerobotics.roadrunner:core:0.4.7'
-    implementation 'ftc.crazycatladies:schrodinger:0.1.1'
-    implementation 'ftc.crazycatladies:nyan:0.1'
+    implementation 'com.acmerobotics.roadrunner:core:0.5.1'
+    implementation 'ftc.crazycatladies:schrodinger:0.1.2'
+    implementation 'ftc.crazycatladies:nyan:0.1.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -34,7 +34,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'ftc.crazycatladies'
             artifactId = 'navicat'
-            version = '0.1.1'
+            version = '0.1.15'
 
             from components.java
         }
@@ -59,8 +59,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/crazycatladies/navicat'
         version {
-            name = '0.1.1'
-            desc = '0.1.1'
+            name = '0.1.15'
+            desc = '0.1.15'
             released  = new Date()
         }
     }

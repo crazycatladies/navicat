@@ -4,6 +4,8 @@ import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.BaseTrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
@@ -18,6 +20,10 @@ import ftc.crazycatladies.nyan.subsystem.Subsystem;
 import ftc.crazycatladies.schrodinger.log.DataLogger;
 import ftc.crazycatladies.schrodinger.state.StateMachine;
 
+import static ftc.crazycatladies.navicat.navigation.DriveConstantsProvider.BASE_CONSTRAINTS;
+import static ftc.crazycatladies.navicat.navigation.DriveConstantsProvider.TRACK_WIDTH;
+import static java.lang.Math.toRadians;
+
 public class Navigation extends Subsystem {
     private MecanumDrive drive;
     private MecanumDriveBase driveBase;
@@ -26,26 +32,23 @@ public class Navigation extends Subsystem {
 
     private Pose2d lastError, currentPose;
 
-    private static DriveConstraints BASE_CONSTRAINTS;
     private final DriveConstraints constraints;
-    private DriveConstants driveConstants;
 
-    public Navigation(boolean useImu, DriveConstants driveConstants,
+    public Navigation(boolean doLocalization, Class driveConstants,
                       PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
-                      DriveConstraints baseConstraints, MecanumDrive.DriveMotorConfig dmc,
+                      MecanumDrive.DriveMotorConfig dmc,
                       String imu1, String imu2) {
+        DriveConstantsProvider.init(driveConstants);
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID);
-        this.BASE_CONSTRAINTS = baseConstraints;
-        this.driveConstants = driveConstants;
-        if (useImu) {
+        if (doLocalization) {
             subsystems.add(localization = new Localization(imu1, imu2));
         }
 
         drive = new MecanumDrive(dmc);
         driveBase = new MecanumDriveBase(drive.frontLeft, drive.backLeft, drive.backRight,
-                drive.frontRight, localization, driveConstants);
+                drive.frontRight, localization);
         subsystems.add(drive);
-        constraints = new MecanumConstraints(BASE_CONSTRAINTS, driveConstants.TRACK_WIDTH);
+        constraints = new MecanumConstraints(BASE_CONSTRAINTS, TRACK_WIDTH);
 
         followSM = new StateMachine<Trajectory>("FollowTrajectory");
         followSM.once((state, trajectory) -> {
@@ -55,7 +58,6 @@ public class Navigation extends Subsystem {
             if (!follower.isFollowing())
                 state.next();
             else {
-                currentPose = driveBase.getPoseEstimate();
                 driveBase.setDriveSignal(follower.update(currentPose));
                 lastError = follower.getLastError();
             }
@@ -71,6 +73,7 @@ public class Navigation extends Subsystem {
         // Loop children in order to update wheel positions, then update pose, then run SM
         loopChildren(bulkDataResponse);
         driveBase.updatePoseEstimate();
+        currentPose = driveBase.getPoseEstimate();
         runCurrentSM();
     }
 
@@ -81,10 +84,14 @@ public class Navigation extends Subsystem {
     private StateMachine<Trajectory> followSM;
 
     public TrajectoryBuilder trajectoryBuilder(double maxVel) {
-        return trajectoryBuilder(new MecanumConstraints(new DriveConstraints(
+        return trajectoryBuilder(maxVelConstraints(maxVel));
+    }
+
+    private MecanumConstraints maxVelConstraints(double maxVel) {
+        return new MecanumConstraints(new DriveConstraints(
                 maxVel, BASE_CONSTRAINTS.maxAccel, BASE_CONSTRAINTS.maxJerk,
                 BASE_CONSTRAINTS.maxAngVel, BASE_CONSTRAINTS.maxAngAccel, BASE_CONSTRAINTS.maxAngJerk
-        ), driveConstants.TRACK_WIDTH));
+        ), TRACK_WIDTH);
     }
 
     public TrajectoryBuilder trajectoryBuilder() {
@@ -95,12 +102,16 @@ public class Navigation extends Subsystem {
         return new TrajectoryBuilder(driveBase.getPoseEstimate(), constraints);
     }
 
+    private TrajectoryBuilder reverseTrajectoryBuilder() {
+        return new TrajectoryBuilder(driveBase.getPoseEstimate(), true, constraints);
+    }
+
     public void followTrajectory(Trajectory trajectory) {
         runSM(followSM, trajectory);
     }
 
-    public void setPoseEstimate(Pose2d pose) {
-        driveBase.setPoseEstimate(pose);
+    public void setPoseEstimate(double x, double y, double heading) {
+        driveBase.setPoseEstimate(new Pose2d(x, y, toRadians(heading)));
     }
 
     @Override
@@ -118,5 +129,32 @@ public class Navigation extends Subsystem {
         if (json.length() > 1) {
             logger.log(json);
         }
+    }
+
+    public void go(BaseTrajectoryBuilder t) {
+        followTrajectory(t.build());
+    }
+    public BaseTrajectoryBuilder to(double x, double y, double heading) {
+        return trajectoryBuilder().lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), constraints);
+    }
+    public BaseTrajectoryBuilder slowTo(double x, double y, double heading) {
+        return trajectoryBuilder(20).lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), maxVelConstraints(20));
+    }
+    public BaseTrajectoryBuilder splineTo(double x, double y, double heading) {
+        return trajectoryBuilder().splineTo(new Vector2d(x, y), toRadians(heading), constraints);
+    }
+    public BaseTrajectoryBuilder reverseTo(double x, double y, double heading) {
+        return reverseTrajectoryBuilder().lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), constraints);
+    }
+    public BaseTrajectoryBuilder reverseSplineTo(double x, double y, double heading) {
+        return reverseTrajectoryBuilder().splineTo(new Vector2d(x, y), toRadians(heading), constraints);
+    }
+
+    public Pose2d getCurrentPose() {
+        return currentPose;
+    }
+
+    public MecanumDriveBase getDriveBase() {
+        return driveBase;
     }
 }
