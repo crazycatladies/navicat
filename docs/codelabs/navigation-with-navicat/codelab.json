@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2020-08-06T22:12:40Z",
+  "id": "navigation-with-navicat",
+  "duration": 60,
+  "title": "Navigation for FTC Robots with Road Runner \u0026 Navicat",
+  "authors": "FTC Crazy Cat Ladies (12827)",
+  "summary": "In this codelab, you'll create FTC robot op modes that use Road Runner \u0026 Navicat to navigate",
+  "source": "12adwUYy0aC4_OqoPyMQfg9CJO1uBxFxHmnBMxXXlbn8",
+  "theme": "navigation",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "Navigation"
+  ],
+  "tags": [
+    "ftc-android"
+  ],
+  "feedback": "https://github.com/crazycatladies/navicat/issues",
+  "ga": "UA-139335019-3",
+  "url": "navigation-with-navicat"
+}

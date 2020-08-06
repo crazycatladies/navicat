@@ -1,0 +1,339 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Navigation for FTC Robots with Road Runner &amp; Navicat</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="UA-139335019-3"
+                  id="navigation-with-navicat"
+                  title="Navigation for FTC Robots with Road Runner &amp; Navicat"
+                  environment="web"
+                  feedback-link="https://github.com/crazycatladies/navicat/issues">
+    
+      <google-codelab-step label="Introduction" duration="0">
+        <p class="image-container"><img style="width: 624.00px" src="img/85eb75195965f08.jpeg"></p>
+<p><strong>Last Updated:</strong> 2020-07-03</p>
+<h2 is-upgraded><strong>What is Navicat?</strong></h2>
+<p>Navicat is a Java library for use in FTC robot control systems that helps with navigation. Navicat builds on two other libraries we have created: <a href="https://github.com/crazycatladies/schrodinger" target="_blank">Schrodinger</a> for state machines and <a href="https://github.com/crazycatladies/nyan" target="_blank">Nyan</a> for subsystems. It also uses the awesome motion planning library <a href="https://github.com/acmerobotics/road-runner" target="_blank">Road Runner</a>, which was created by <a href="https://goacmerobotics.com/" target="_blank">Team 8367 Acme Robotics</a>.</p>
+<h3 is-upgraded><strong>What is Robot Navigation?</strong></h3>
+<p>Navigation means a robot&#39;s ability to know its location (also called localization) and move to a target location. With a good navigation system, you can focus more on giving the robot instructions on where to go and what to do instead of how to get there.</p>
+<h3 is-upgraded><strong>About Road Runner</strong></h3>
+<p>With Road Runner, you can specify complex paths for your robot to travel including start and finish orientation and position. Road Runner figures out how the motors should be powered to follow the path, and computes the position of the robot using odometry in order to make adjustments according to the actual speed and travel of the wheels. It also uses motion profiling to constrain the velocity, acceleration, and jerk of the robot to reduce wheel slippage and wear on robot parts. You can learn a lot more about Road Runner in this <a href="https://acme-robotics.gitbook.io/road-runner/tour/introduction" target="_blank">tour</a>.</p>
+<h3 is-upgraded><strong>What does Navicat do?</strong></h3>
+<p>By using Schrodinger, Nyan, &amp; Navicat together, you can create autonomous op modes which have a powerful, easy-to-use, reliable navigation ability which is accessible as a subsystem and is part of a state machine framework which makes it easy for robot components to perform complex operations while navigating.</p>
+<p>Currently, Navicat works only for robots with a mecanum drivetrain and no odometry free wheels. For the purpose of this codelab, the drivetrain motors must have encoders which are properly configured, also.</p>
+<h2 is-upgraded><strong>What you&#39;ll build</strong></h2>
+<p>In this codelab, you&#39;re going to go through the steps required to setup Road Runner for your robot and create an op mode for an FTC robot that uses the Navicat library for navigation.</p>
+<h2 class="checklist" is-upgraded><strong>What you&#39;ll learn</strong></h2>
+<ul class="checklist">
+<li>How to perform tuning to determine your robot&#39;s configuration values using the Road Runner Quickstart project</li>
+<li>How to install Navicat into your FTC Android Studio project</li>
+<li>How to create an autonomous op mode that uses Navicat</li>
+</ul>
+<h2 is-upgraded><strong>What you&#39;ll need</strong></h2>
+<ul>
+<li>A computer with Android Studio</li>
+<li>A robot with a mecanum drivetrain</li>
+</ul>
+<aside class="warning"><p><strong>Note:</strong> This codelab is not intended for those who are completely new to the use of Android Studio for FTC robot programming. Please start by completing the entire <a href="https://github.com/FIRST-Tech-Challenge/SKYSTONE/wiki/Android-Studio-Tutorial" target="_blank">Android Studio Tutorial</a> if you have not used Android Studio to create an OpMode previously.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting set up for Road Runner tuning" duration="10">
+        <h2 is-upgraded><strong>Install Android Studio</strong></h2>
+<p>If you do not already have Android Studio installed, follow the instructions for <a href="https://github.com/FIRST-Tech-Challenge/SKYSTONE/wiki/Installing-Android-Studio" target="_blank">Installing Android Studio</a></p>
+<h2 is-upgraded><strong>Download the Road Runner Quickstart project</strong></h2>
+<p>Download the Road Runner Quickstart project from <a href="https://github.com/acmerobotics/road-runner-quickstart/archive/master.zip" target="_blank">https://github.com/acmerobotics/road-runner-quickstart/archive/master.zip</a>. Unzip the file and open the project in Android Studio.</p>
+<p>Find and open the DriveConstraints class.</p>
+<aside class="special"><p>The authoritative description of the Road Runner tuning process is found at <a href="https://acme-robotics.gitbook.io/road-runner/quickstart/tuning" target="_blank">https://acme-robotics.gitbook.io/road-runner/quickstart/tuning</a>. Our goal in this codelab is to walk through one path in a way that can be easily followed by those who are new to Road Runner.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Manual configuration settings for Road Runner" duration="5">
+        <h2 is-upgraded><strong>Setting values related to motor speed and encoder</strong></h2>
+<p>The first two configuration values we&#39;ll set are specific to the motor in your drive train and do not require testing. You can find these values in information provided by the motor manufacturer. TICKS_PER_REV refers to the encoder ticks per revolution of the motor and MAX_RPM refers to the maximum RPMs of the motor itself.</p>
+<h3 is-upgraded><strong>DriveConstants.java - lines 24-25 (values for HD Hex / Neverest / Yellow Jacket motors)</strong></h3>
+<pre><code>public static final double TICKS_PER_REV = 28;
+public static final double MAX_RPM = 6000;</code></pre>
+<h2 is-upgraded><strong>Setting values related to drivetrain</strong></h2>
+<p>The next three values can all be determined by examining the drivetrain: the radius of the drive wheels, the gear ratio which is applied between the motor and the wheels, and the track width between left and right wheels. Please note that the gear ratio should include any gearbox which is mounted onto the motor. For example, a Neverest 40 motor with a mounted 80-tooth gear driving a 40-tooth gear on the wheel axle would have a total gear ratio of 20:1. The example below shows a simple case of a &#34;20:1&#34; gearbox, such as the Rev or AndyMark orbitals. These have an actual ratio of 19.2:1.</p>
+<aside class="warning"><p>Note that the GEAR_RATIO fraction should be less than one since it describes the speed ratio, not the torque ratio.</p>
+</aside>
+<h3 is-upgraded><strong>DriveConstants.java - lines 42-44 - for REV 75mm mecanum wheel and &#34;20:1&#34; gearbox</strong></h3>
+<pre><code>public static double WHEEL_RADIUS = 1.475; // in
+public static double GEAR_RATIO = 1 / 19.2; // output (wheel) speed / input (motor) speed
+public static double TRACK_WIDTH = 14; // in</code></pre>
+<aside class="special"><p>You&#39;ll replace the TRACK_WIDTH variable later with a value that is determined by testing.</p>
+</aside>
+<h2 is-upgraded><strong>Modifications to match robot configuration</strong></h2>
+<p>Next, we&#39;ll need to make a few modifications to the SimpleMecanumDrive class. We&#39;ll update the motor names and imu name to match the configuration for your robot, and reverse the direction for two of the motors.</p>
+<p>If your robot configuration has a different name for the imu, replace the string in line 108. Similarly, update the motor names in lines 117-120 to match your robot configuration.</p>
+<h3 is-upgraded><strong>SampleMecanumDrive.java - lines 108 - 120</strong></h3>
+<pre><code>imu = hardwareMap.get(BNO055IMU.class, &#34;imu&#34;);
+BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+imu.initialize(parameters);
+
+// TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
+// upward (normal to the floor) using a command like the following:
+// BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+
+leftFront = hardwareMap.get(DcMotorEx.class, &#34;leftFront&#34;);
+leftRear = hardwareMap.get(DcMotorEx.class, &#34;leftRear&#34;);
+rightRear = hardwareMap.get(DcMotorEx.class, &#34;rightRear&#34;);
+rightFront = hardwareMap.get(DcMotorEx.class, &#34;rightFront&#34;);</code></pre>
+<p>Insert lines 141-142 as shown below to reverse the direction of the two right motors since these face the opposite direction from the left motors.</p>
+<h3 is-upgraded><strong>SampleMecanumDrive.java - line 140 + inserted lines 141-142</strong></h3>
+<pre><code>// TODO: reverse any motors using DcMotor.setDirection()
+rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+rightRear.setDirection(DcMotorSimple.Direction.REVERSE);</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Localization Test and Drive Velocity PID" duration="5">
+        <h2 is-upgraded><strong>Localization Test</strong></h2>
+<p>With all the necessary DriveConstant values set, we&#39;re ready to run the first test, LocalizationTest. While this op mode is running and you drive the robot, Road Runner is computing the robot&#39;s position and heading based on the DriveConstants you provided earlier (gear ratio, wheel size, etc.) in combination with the information about the activity of the motors from the motor encoders. Make sure that the values displayed correspond to the movement of the robot as you drive.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/ZDAE3h5bw-s?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p>In this example, we have driven the robot straight for 12 inches, and we see that reflected on the Driver Station phone.</p>
+<p class="image-container"><img style="width: 331.39px" src="img/76fbdff1987a7c1a.png"></p>
+<h2 is-upgraded><strong>Drive Velocity PID Test</strong></h2>
+<p>If you haven&#39;t heard of Proportional-Integral-Derivative (PID) Control before, it probably sounds really complex. But, the basic concepts are pretty simple. If we take driving as an example, proportionate control would have you turn the steering wheel more when the car is further out of it&#39;s lane. Integral control would have you turn the steering wheel more if it doesn&#39;t respond enough when you turn it less. Derivative control would have you turn the steering wheel more if the car is moving further out of its lane.</p>
+<p>The next test is about making sure that the motor controllers in the expansion (or control) hub has PID constants which cause the motors to move precisely (as much as possible) at the speeds that Road Runner computes for navigating along the paths that are specified. So, if the motor needs to speed up a lot, the motor controller should set the power much higher. If the amount of power supplied isn&#39;t making the motor goes fast enough, it should be increased, etc.</p>
+<p>The test has the robot repeatedly travel back and forth over a distance of 72 inches. If you don&#39;t have that much room available, change the distance to a smaller number (of inches).</p>
+<aside class="warning"><p>You will want to perform these tests on game tiles to obtain accurate measurements for the real game environment. You will also need to re-run the tests after any changes that affect the weight of the robot or the distribution of weight on the wheels.</p>
+</aside>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/HyyY4EK_fVA?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p>While running the test, you&#39;ll use the FTC Dashboard at <a href="http://192.168.49.1:8080/dash" target="_blank">http://192.168.49.1:8080/dash</a> to see how closely the actual motor velocity (green below) matches the target (red below). Change the kP, kI, &amp; kD parameters under VELO_PID in the dashboard to reduce the distance between the red &amp; green lines (i.e. error). The official Quickstart tuning guide describes the process as the following:</p>
+<ol type="1" start="1">
+<li>Increase kP until any phase lag is eliminated. Concurrently increase kD as necessary to mitigate oscillations.</li>
+<li>Add kI (or adjust kF) until the steady state/constant velocity plateaus are reached.</li>
+<li>Back off kP and kD a little until the response is less oscillatory (but without lag).</li>
+</ol>
+<p><a href="https://acme-robotics.gitbook.io/road-runner/quickstart/tuning#drive-velocity-pid" target="_blank">https://acme-robotics.gitbook.io/road-runner/quickstart/tuning#drive-velocity-pid</a></p>
+<p>If you struggle with finding the best values, see how well you can do by just adjusting kP, working your way up from a low value slowly.</p>
+<p class="image-container"><img style="width: 624.00px" src="img/a750bf0772e03af4.png"></p>
+<p>When you have determined the values for kP, kI, &amp; kD, put them in the MOTOR_VELO_PID constant in DriveConstants:</p>
+<h3 is-upgraded><strong>DriveConstants.java - line 32 (your values will be different)</strong></h3>
+<pre><code>public static final PIDCoefficients MOTOR_VELO_PID = new PIDCoefficients(15.0, 0.0, 0.0);</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Straight Test, Drive Track Width, &amp; Turn Test" duration="5">
+        <h2 is-upgraded><strong>Straight Test</strong></h2>
+<p>The next test will validate the values set by the preceding steps. StraightTest will use RoadRunner to plan and execute a drive 60 inches straight ahead. The robot should land within a few inches of the target distance.</p>
+<aside class="special"><p>If you&#39;re limited on space like we were, you can change the DISTANCE constant in the StraightTest.java class. The important thing is just that the robot travels (roughly) the same distance.</p>
+</aside>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/bHsvppsKkOY?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h2 is-upgraded><strong>Drive Track Width</strong></h2>
+<p>TrackWidthTuner will calculate the best value to use for your robot&#39;s TRACK_WIDTH parameter by turning the robot and monitoring the actual heading as reported by the IMU.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/Tcygh4CJZeo?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<p>The computed track width is displayed as telemetry on the Driver Station. Use this value to replace the one you entered into DriveConstants.java.</p>
+<p class="image-container"><img style="width: 331.20px" src="img/47bc7a7d546d397.png"></p>
+<h2 is-upgraded><strong>Turn Test</strong></h2>
+<p>TurnTest will allow you to verify that the calculated TRACK_WIDTH is suitable for the turning characteristics of your robot. Try changing the ANGLE constant in TurnTest.java to several different values and observing how well the robot matches after running the op mode.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/ixF1J-cZM9g?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Spline Test &amp; Follower PID" duration="10">
+        <h2 is-upgraded><strong>Spline Test</strong></h2>
+<p>Now that you&#39;ve done all the tuning to configure Road Runner for your robot, SplineTest will show off the ability that Road Runner provides to smoothly execute complex paths.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/KXd1WXWKZnA?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<h2 is-upgraded><strong>Follower PID</strong></h2>
+<p>Up until this point, Road Runner has been keeping track of the estimated position of the robot during tests, but hasn&#39;t used this information to affect it&#39;s movement. FollowerPIDTuner is your opportunity to turn on and tune the follower capability which uses the robot&#39;s position as feedback to make corrections to the robot&#39;s movements. Find the TRANSLATIONAL_PID and HEADING_PID constants in the SampleMecanumDrive.java class and try low single-digit values for kP to improve the robot&#39;s ability to execute the square pattern accurately.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/WDYV9YOuaHE?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting set up for Navicat" duration="10">
+        <h2 is-upgraded><strong>Create the project</strong></h2>
+<p>If you are familiar with git, create a new clone of the <a href="https://github.com/FIRST-Tech-Challenge/SkyStone.git" target="_blank">FTC project repository</a> on your computer. Otherwise, just follow these instructions for <a href="https://github.com/FIRST-Tech-Challenge/SKYSTONE/wiki/Downloading-the-Android-Studio-Project-Folder" target="_blank">Downloading the Android Studio Project Folder</a> </p>
+<aside class="special"><p>It&#39;s convenient to create your Navicat sample op mode for this codelab in the Quickstart project, but we would suggest that you clone the official FTC SDK project for your control system during the season so that you can pull down official updates during the year.</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add Navicat to your project" duration="5">
+        <h2 is-upgraded>Adding the crazycatladies Maven repository</h2>
+<p>You&#39;ll need to let Android Studio (the gradle build system, really) know from where it can download the schrodinger, nyan, and navicat libraries. Add <code>maven { url &#39;https://dl.bintray.com/crazycatladies/maven&#39; }</code> to the repositories section at the bottom of the <code>build.gradle</code> file in the root folder of your project.</p>
+<aside class="special"><p>If you have already completed the <a href="https://crazycatladies.github.io/schrodinger/codelabs/state-machines-with-schrodinger" target="_blank">Schrodinger codelab</a> or <a href="https://crazycatladies.github.io/nyan/codelabs/subsystems-with-nyan" target="_blank">Nyan codelab</a> and are using the same project, then you do not have to repeat this step</p>
+</aside>
+<h3 is-upgraded><strong>build.gradle</strong></h3>
+<pre><code>/**
+* Top-level build file for ftc_app project.
+*
+* It is extraordinarily rare that you will ever need to edit this file.
+*/
+buildscript {
+   repositories {
+       google()
+       jcenter()
+   }
+   dependencies {
+       classpath &#39;com.android.tools.build:gradle:3.4.1&#39;
+   }
+}
+
+// This is now required because aapt2 has to be downloaded from the
+// google() repository beginning with version 3.2 of the Android Gradle Plugin
+allprojects {
+   repositories {
+       google()
+       jcenter()
+       maven { url &#39;https://dl.bintray.com/crazycatladies/maven&#39; }
+   }
+}</code></pre>
+<h2 is-upgraded><strong>Add the schrodinger, nyan, navicat, and Road Runner dependencies</strong></h2>
+<p>You&#39;ll make your project dependent on Schrodinger, Nyan, and Navicat, which will cause Android Studio (gradle, really) to download the library, by adding six new entries (shown below) to the end of the dependencies section in <code>TeamCode/build.release.gradle</code></p>
+<aside class="special"><p>If you have already completed the <a href="https://crazycatladies.github.io/schrodinger/codelabs/state-machines-with-schrodinger" target="_blank">Schrodinger codelab</a> or <a href="https://crazycatladies.github.io/nyan/codelabs/subsystems-with-nyan" target="_blank">Nyan codelab</a> and are using the same project, then you&#39;ll only need to add the dependencies for Navicat and Road Runner</p>
+</aside>
+<h3 is-upgraded><strong>TeamCode/build.release.gradle</strong></h3>
+<pre><code>dependencies {
+   implementation project(&#39;:FtcRobotController&#39;)
+   implementation (name: &#39;RobotCore-release&#39;, ext: &#39;aar&#39;)
+   implementation (name: &#39;Hardware-release&#39;, ext: &#39;aar&#39;)
+   implementation (name: &#39;FtcCommon-release&#39;, ext: &#39;aar&#39;)
+   implementation (name: &#39;WirelessP2p-release&#39;, ext:&#39;aar&#39;)
+   implementation (name: &#39;tfod-release&#39;, ext:&#39;aar&#39;)
+   implementation (name: &#39;tensorflow-lite-0.0.0-nightly&#39;, ext:&#39;aar&#39;)
+
+   implementation &#39;com.acmerobotics.roadrunner:core:0.4.7&#39;
+   implementation &#39;org.openftc:rev-extensions-2:1.2&#39;
+   implementation &#39;com.acmerobotics.dashboard:dashboard:0.3.7&#39;
+   implementation &#39;ftc.crazycatladies:schrodinger:0.1.4&#39;
+   implementation &#39;ftc.crazycatladies:nyan:0.1.1&#39;
+   implementation &#39;ftc.crazycatladies:navicat:0.1.15&#39;
+}</code></pre>
+<h2 is-upgraded><strong>Update build settings to enable Java 8</strong></h2>
+<p>Nyan uses Java 8 features, and you&#39;ll probably want to do the same in your own code. You can enable Java 8 by changing the <code>compileOptions</code> section in <code>build.common.gradle</code> (in the root folder of the project):</p>
+<pre><code>compileOptions {
+   sourceCompatibility JavaVersion.VERSION_1_8
+   targetCompatibility JavaVersion.VERSION_1_8
+}</code></pre>
+<aside class="special"><p>Again, if you have already completed the <a href="https://crazycatladies.github.io/schrodinger/codelabs/state-machines-with-schrodinger" target="_blank">Schrodinger codelab</a> or <a href="https://crazycatladies.github.io/nyan/codelabs/subsystems-with-nyan" target="_blank">Nyan codelab</a> and are using the same project, then you do not have to repeat this step</p>
+</aside>
+<h2 is-upgraded><strong>Update gradle</strong></h2>
+<p>After changing and saving these files, you should be able to update gradle by clicking &#34;Sync Now&#34; in the bar which appears at the top of these files:</p>
+<p class="image-container"><img style="width: 624.00px" src="img/64baeddec544d315.png"></p>
+<p>If everything has gone well, your project will now reference the downloaded schrodinger, nyan, navicat, and roadrunner external libraries, which you can see in the &#34;Project&#34; view of the Project window:</p>
+<p class="image-container"><img style="width: 436.50px" src="img/1c3f3e414910ff57.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Setup Road Runner for Navicat" duration="5">
+        <h2 is-upgraded>Add Drive Constants from Tuning</h2>
+<p>If you&#39;ve created a new project for trying out Navicat, copy the DriveConstants.java file from the Quick Start project into your new project.</p>
+<h2 is-upgraded><strong>Create an Autonomous Op Mode</strong></h2>
+<p>If you&#39;ve completed the <a href="https://crazycatladies.github.io/nyan/codelabs/subsystems-with-nyan" target="_blank">Nyan codelab</a>, you&#39;re aware that Nyan provides a framework for creating Autonomous op modes that cuts down on the amount of code that you need to write. Navicat takes this further with base classes for your autonomous op mode and top-level robot class which has navigation features built in. The result is that you can have a navigation-enabled autonomous op mode with only the 27 lines of code shown here:</p>
+<h3 is-upgraded><strong>AwesomeAuto.java</strong></h3>
+<pre><code>package org.firstinspires.ftc.teamcode;
+
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import ftc.crazycatladies.navicat.navigation.*;
+import ftc.crazycatladies.schrodinger.state.*;
+
+@Autonomous(name = &#34;AwesomeAuto&#34;)
+public class AwesomeAuto extends AbstractNavAuto {
+   PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(3, 0, 0);
+   PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0, 0);
+
+   public AwesomeAuto() {
+       robot = navRobot = new NavRobot(true,
+               DriveConstants.class, TRANSLATIONAL_PID, HEADING_PID,
+               new MecanumDrive.DriveMotorConfig(&#34;FL&#34;, 2, &#34;FR&#34;, 2,
+                       &#34;BL&#34;, 2, &#34;BR&#34;, 2),
+               &#34;imu&#34;, &#34;imu 1&#34;);
+   }
+
+   @Override
+   protected StateMachine stateMachine() {
+       StateMachine sm = new StateMachine(&#34;AwesomeAutoSM&#34;);
+       return sm.init();
+   }
+}</code></pre>
+<p>You&#39;ll recognize the TRANSLATIONAL_PID &amp; HEADING_PID constants from FollowerPIDTuner. Replace the values with the ones that you have determined for your own robot. You&#39;ll also want to use the appropriate drive motor names for you robot in place of &#34;FL&#34;, &#34;FR&#34;, &#34;BL&#34;, and &#34;BR&#34;, along with the hub number for each (in place of &#34;2&#34;). Update &#34;imu&#34; &amp; &#34;imu 1&#34; if your have different names, and replace &#34;imu 1&#34; with null if you have only a single control/expansion hub.</p>
+<p>This op mode won&#39;t do anything interesting, but try it out to make sure that there aren&#39;t any errors, and then we&#39;ll make it more interesting.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Add a complex path to your autonomous op mode" duration="5">
+        <p>In the <a href="https://crazycatladies.github.io/nyan/codelabs/subsystems-with-nyan" target="_blank">Nyan codelab</a>, you&#39;ll see a description of how you can orchestrate the actions of your robot in an autonomous op mode using a state machine. That&#39;s exactly what we&#39;ll do here by adding to the stateMachine() method:</p>
+<h3 is-upgraded><strong>AwesomeAuto.java</strong></h3>
+<pre><code>@Override
+protected StateMachine stateMachine() {
+   StateMachine sm = new StateMachine(&#34;AwesomeAutoSM&#34;);
+
+   sm.once((state, context) -&gt; {
+       navRobot.getNav().setPoseEstimate(0, 0, 0);
+       go(splineTo(30, 30, 0));
+       // (optional) start operations in subsystem state machines
+   });
+   sm.repeat(waitForNav());
+   sm.once((state, context) -&gt; {
+       go(slowTo(30, -30, 0));
+   });
+   sm.repeat(waitForNav());
+   sm.once((state, context) -&gt; {
+       go(reverseSplineTo(0, 0, 180));
+   });
+   sm.repeat(waitForNav());
+   sm.once((state, context) -&gt; {
+       go(to(30, 30, 90));
+   });
+   sm.repeat(waitForNav());
+   sm.once((state, context) -&gt; {
+       go(to(30, -30, 0));
+   });
+   sm.repeat(waitForNav());
+   sm.once((state, context) -&gt; {
+       go(to(0, 0, -90));
+   });
+   sm.repeat(waitForNav());
+
+   return sm.init();
+}</code></pre>
+<p>Note that several different navigation methods are used to create the complex path that the robot follows: splineTo, slowTo, reverseSplineTo, and to. Each of these methods takes a target pose (x, y, &amp; heading). Although Road Runner natively uses radians, Navicat accepts degree values to make things easier.</p>
+<iframe class="youtube-video" src="https://www.youtube.com/embed/4kMjaeRISts?rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+
+</body>
+</html>
