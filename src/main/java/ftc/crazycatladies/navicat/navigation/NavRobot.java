@@ -39,4 +39,8 @@ public class NavRobot extends Subsystem {
     public Navigation getNav() {
         return nav;
     }
+
+    public void move(double forward, double turn, double strafe) {
+        nav.move(forward, turn, strafe);
+    }
 }

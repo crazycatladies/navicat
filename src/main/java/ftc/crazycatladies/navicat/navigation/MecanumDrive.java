@@ -20,9 +20,15 @@ public class MecanumDrive extends Subsystem {
         private final int frHub;
         private final int blHub;
         private final int brHub;
+        private final boolean flReverse;
+        private final boolean frReverse;
+        private final boolean blReverse;
+        private final boolean brReverse;
 
-        public DriveMotorConfig(String frontLeft, int flHub, String frontRight, int frHub,
-                                String backLeft, int blHub, String backRight, int brHub) {
+        public DriveMotorConfig(String frontLeft, int flHub, boolean flReverse,
+                                String frontRight, int frHub, boolean frReverse,
+                                String backLeft, int blHub, boolean blReverse,
+                                String backRight, int brHub, boolean brReverse) {
             this.frontLeft = frontLeft;
             this.frontRight = frontRight;
             this.backLeft = backLeft;
@@ -31,6 +37,10 @@ public class MecanumDrive extends Subsystem {
             this.frHub = frHub;
             this.blHub = blHub;
             this.brHub = brHub;
+            this.flReverse = flReverse;
+            this.frReverse = frReverse;
+            this.blReverse = blReverse;
+            this.brReverse = brReverse;
         }
     }
 
@@ -38,10 +48,10 @@ public class MecanumDrive extends Subsystem {
     private List<DcMotorEx> allMotors;
 
     public MecanumDrive(DriveMotorConfig dmc) {
-        this.frontLeft = new DcMotorEx(dmc.frontLeft, dmc.flHub, true);
-        this.frontRight = new DcMotorEx(dmc.frontRight, dmc.frHub, false);
-        this.backLeft = new DcMotorEx(dmc.backLeft, dmc.blHub, true);
-        this.backRight = new DcMotorEx(dmc.backRight, dmc.brHub, false);
+        this.frontLeft = new DcMotorEx(dmc.frontLeft, dmc.flHub, !dmc.flReverse);
+        this.frontRight = new DcMotorEx(dmc.frontRight, dmc.frHub, !dmc.frReverse);
+        this.backLeft = new DcMotorEx(dmc.backLeft, dmc.blHub, !dmc.blReverse);
+        this.backRight = new DcMotorEx(dmc.backRight, dmc.brHub, !dmc.brReverse);
 
         allMotors = Arrays.asList(new DcMotorEx[]{this.frontLeft, this.frontRight, this.backLeft, this.backRight});
 
