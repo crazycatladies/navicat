@@ -3,7 +3,6 @@ package ftc.crazycatladies.navicat.navigation;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import java.util.ArrayList;
@@ -34,9 +33,6 @@ public class MecanumDriveBase extends MecanumDrive {
     }
 
     public void init() {
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-
         for (DcMotorEx motor : motors) {
             if (RUN_USING_ENCODER) {
                 motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
