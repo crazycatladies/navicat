@@ -68,7 +68,7 @@ public class Navigation extends Subsystem {
     }
 
     @Override
-    public void loop(Map<Integer, LynxGetBulkInputDataResponse> bulkDataResponse) {
+    public void loop(Map<Integer, LynxGetBulkInputDataResponse> bulkDataResponse) throws InterruptedException {
         lastError = null;
         // Loop children in order to update wheel positions, then update pose, then run SM
         loopChildren(bulkDataResponse);

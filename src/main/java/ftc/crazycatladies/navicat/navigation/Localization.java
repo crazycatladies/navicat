@@ -50,7 +50,7 @@ public class Localization extends Subsystem {
     }
 
     @Override
-    public void loop(Map<Integer, LynxGetBulkInputDataResponse> bulkDataResponse) {
+    public void loop(Map<Integer, LynxGetBulkInputDataResponse> bulkDataResponse) throws InterruptedException {
         radHeading = null;
 
         super.loop(bulkDataResponse);
