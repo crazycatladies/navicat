@@ -25,8 +25,8 @@ dependencies {
     implementation files('libs/Hardware.jar')
     implementation('org.json:json:20190722')
     implementation 'com.acmerobotics.roadrunner:core:0.5.1'
-    implementation 'ftc.crazycatladies:schrodinger:0.1.2'
-    implementation 'ftc.crazycatladies:nyan:0.1.8'
+    implementation 'ftc.crazycatladies:schrodinger:0.2'
+    implementation 'ftc.crazycatladies:nyan:0.2'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
@@ -35,7 +35,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'ftc.crazycatladies'
             artifactId = 'navicat'
-            version = '0.1.19'
+            version = '0.2'
 
             from components.java
         }
@@ -60,8 +60,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/crazycatladies/navicat'
         version {
-            name = '0.1.19'
-            desc = '0.1.19'
+            name = '0.2'
+            desc = '0.2'
             released  = new Date()
         }
     }
