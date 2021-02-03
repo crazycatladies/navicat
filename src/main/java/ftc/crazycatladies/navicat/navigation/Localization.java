@@ -22,6 +22,7 @@ public class Localization extends Subsystem {
     private String imu2;
 
     public Localization(String imu1, String imu2) {
+        super("Localization");
         this.imu1 = imu1;
         this.imu2 = imu2;
     }

@@ -38,6 +38,7 @@ public class Navigation extends Subsystem {
                       PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                       MecanumDrive.DriveMotorConfig dmc,
                       String imu1, String imu2) {
+        super("Navigation");
         DriveConstantsProvider.init(driveConstants);
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID);
         if (doLocalization) {

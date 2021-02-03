@@ -48,6 +48,7 @@ public class MecanumDrive extends Subsystem {
     private List<DcMotorEx> allMotors;
 
     public MecanumDrive(DriveMotorConfig dmc) {
+        super("MecanumDrive");
         this.frontLeft = new DcMotorEx(dmc.frontLeft, dmc.flHub, !dmc.flReverse);
         this.frontRight = new DcMotorEx(dmc.frontRight, dmc.frHub, !dmc.frReverse);
         this.backLeft = new DcMotorEx(dmc.backLeft, dmc.blHub, !dmc.blReverse);

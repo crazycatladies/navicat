@@ -12,6 +12,7 @@ public class NavRobot extends Subsystem {
                     PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                     MecanumDrive.DriveMotorConfig dmc,
                     String imu1, String imu2) {
+        super("NavRobot");
         this.nav = new Navigation(doLocalization, driveConstants,
                 TRANSLATIONAL_PID, HEADING_PID, dmc, imu1, imu2);
         subsystems.add(nav);
