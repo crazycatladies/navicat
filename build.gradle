@@ -35,7 +35,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'ftc.crazycatladies'
             artifactId = 'navicat'
-            version = '0.2.2'
+            version = '0.2.7'
 
             from components.java
         }
@@ -60,8 +60,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/crazycatladies/navicat'
         version {
-            name = '0.2.2'
-            desc = '0.2.2'
+            name = '0.2.7'
+            desc = '0.2.7'
             released  = new Date()
         }
     }
