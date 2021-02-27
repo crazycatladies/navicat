@@ -19,6 +19,7 @@ import com.qualcomm.hardware.lynx.commands.core.LynxGetBulkInputDataResponse;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 import ftc.crazycatladies.nyan.subsystem.Subsystem;
@@ -30,7 +31,7 @@ import static ftc.crazycatladies.navicat.navigation.DriveConstantsProvider.TRACK
 import static java.lang.Math.toRadians;
 
 public class Navigation extends Subsystem {
-    class TurnContext {
+    static class TurnContext {
         double angle;
         MotionProfile profile;
 
@@ -63,10 +64,10 @@ public class Navigation extends Subsystem {
     private final PIDFController turnController;
     private final StateMachine<Trajectory> followSM;
     private final StateMachine<TurnContext> turnSM;
-    private MecanumDrive drive;
-    private MecanumDriveBase driveBase;
+    private final MecanumDrive drive;
+    private final MecanumDriveBase driveBase;
     private Localization localization;
-    private HolonomicPIDVAFollower follower;
+    private final HolonomicPIDVAFollower follower;
 
     private Pose2d lastError, currentPose;
 
@@ -75,7 +76,8 @@ public class Navigation extends Subsystem {
     public Navigation(boolean doLocalization, Class driveConstants,
                       PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                       MecanumDrive.DriveMotorConfig dmc,
-                      String imu1, String imu2) {
+                      String imu1, String imu2, List<Pose2d> trackingWheelPoses, Encoder leftEncoder,
+                      Encoder rightEncoder, Encoder middleEncoder) {
         super("Navigation");
         DriveConstantsProvider.init(driveConstants);
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID);
@@ -85,7 +87,7 @@ public class Navigation extends Subsystem {
 
         drive = new MecanumDrive(dmc);
         driveBase = new MecanumDriveBase(drive.frontLeft, drive.backLeft, drive.backRight,
-                drive.frontRight, localization);
+                drive.frontRight, localization, trackingWheelPoses, leftEncoder, rightEncoder, middleEncoder);
         subsystems.add(drive);
         constraints = new MecanumConstraints(BASE_CONSTRAINTS, TRACK_WIDTH);
 

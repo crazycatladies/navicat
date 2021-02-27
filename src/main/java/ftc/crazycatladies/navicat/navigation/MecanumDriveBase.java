@@ -2,6 +2,8 @@ package ftc.crazycatladies.navicat.navigation;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.localization.Localizer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
@@ -18,7 +20,9 @@ public class MecanumDriveBase extends MecanumDrive {
     private Localization localization;
 
     public MecanumDriveBase(DcMotorEx leftFront, DcMotorEx leftRear, DcMotorEx rightRear,
-                            DcMotorEx rightFront, Localization localization) {
+                            DcMotorEx rightFront, Localization localization,
+                            List<Pose2d> trackingWheelPoses, Encoder leftEncoder,
+                            Encoder rightEncoder, Encoder middleEncoder) {
         super(kV, kA, kStatic, TRACK_WIDTH);
         this.leftFront = leftFront;
         this.rightFront = rightFront;
@@ -26,7 +30,9 @@ public class MecanumDriveBase extends MecanumDrive {
         this.rightRear = rightRear;
         this.localization = localization;
 
-        if (localization == null)
+        if (trackingWheelPoses != null)
+            setLocalizer(new StandardTrackingWheelLocalizer(leftEncoder, rightEncoder, middleEncoder, this));
+        else if (localization == null)
             setLocalizer(new MecanumLocalizer(this, false));
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
