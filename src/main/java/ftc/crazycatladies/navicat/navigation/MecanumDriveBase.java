@@ -19,11 +19,13 @@ public class MecanumDriveBase extends MecanumDrive {
     private List<DcMotorEx> motors;
     private Localization localization;
 
+    public static double LATERAL_MULTIPLIER = 1.6;
+
     public MecanumDriveBase(DcMotorEx leftFront, DcMotorEx leftRear, DcMotorEx rightRear,
                             DcMotorEx rightFront, Localization localization,
                             List<Pose2d> trackingWheelPoses, Encoder leftEncoder,
                             Encoder rightEncoder, Encoder middleEncoder) {
-        super(kV, kA, kStatic, TRACK_WIDTH);
+        super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
         this.leftFront = leftFront;
         this.rightFront = rightFront;
         this.leftRear = leftRear;

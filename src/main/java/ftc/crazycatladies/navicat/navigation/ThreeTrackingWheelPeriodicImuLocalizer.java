@@ -114,6 +114,6 @@ public abstract class ThreeTrackingWheelPeriodicImuLocalizer implements Localize
     @Nullable
     @Override
     public Pose2d getPoseVelocity() {
-        return null;
+        return poseVelocity;
     }
 }
