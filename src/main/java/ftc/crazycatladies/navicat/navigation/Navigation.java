@@ -14,6 +14,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints;
+import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetBulkInputDataResponse;
 
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +70,12 @@ public class Navigation extends Subsystem {
     private Localization localization;
     private final HolonomicPIDVAFollower follower;
 
-    private Pose2d lastError, currentPose;
+    private Pose2d lastError;
+
+    /**
+     * Transfer between successive op modes using static
+     */
+    private static Pose2d currentPose;
 
     private final DriveConstraints constraints;
 
@@ -119,7 +125,7 @@ public class Navigation extends Subsystem {
         turnSM.repeat((state, context) -> {
             MotionState targetState = context.profile.get(state.getTimeInState().seconds());
             if (state.getTimeInState().seconds() > context.profile.duration()
-                    && Math.abs(currentPose.getHeading() - targetState.getX()) < Math.toRadians(1.0)) {
+                    && Math.abs(Angle.normDelta(currentPose.getHeading() - targetState.getX())) < Math.toRadians(1.0)) {
                 driveBase.setDriveSignal(new DriveSignal());
                 state.next();
             } else {

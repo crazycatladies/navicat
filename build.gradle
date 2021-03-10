@@ -4,6 +4,8 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
+def navicatVersion = '0.5.5'
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -24,7 +26,7 @@ dependencies {
     implementation('org.json:json:20190722')
     implementation 'com.acmerobotics.roadrunner:core:0.5.1'
     implementation 'ftc.crazycatladies:schrodinger:0.2'
-    implementation 'ftc.crazycatladies:nyan:0.2.3'
+    implementation 'ftc.crazycatladies:nyan:0.5.7'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
@@ -34,7 +36,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'ftc.crazycatladies'
             artifactId = 'navicat'
-            version = '0.3.3'
+            version = navicatVersion
 
             from components.java
         }
@@ -59,8 +61,8 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/crazycatladies/navicat'
         version {
-            name = '0.3.3'
-            desc = '0.3.3'
+            name = navicatVersion
+            desc = navicatVersion
             released  = new Date()
         }
     }
