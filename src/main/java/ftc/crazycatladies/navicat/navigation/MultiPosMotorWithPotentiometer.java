@@ -23,17 +23,23 @@ public class MultiPosMotorWithPotentiometer<P extends AngularPosition> extends D
     class MoveContext {
         MotionProfile mp;
         MotionState ms;
+        boolean holdPosition;
 
-        public MoveContext(MotionProfile mp, MotionState ms) {
+        public MoveContext(MotionProfile mp, MotionState ms, boolean holdPosition) {
             this.mp = mp;
             this.ms = ms;
+            this.holdPosition = holdPosition;
         }
 
         @Override
         public String toString() {
-            return "MoveContext{mp=" + mp +
-                    ", ms={" + ms.getX() + ',' + ms.getV() + ',' + ms.getA() + ',' + ms.getJ() +
-                    "}, x=" + analogSensor.getAngle() + "}";
+            if (ms == null)
+                return "MoveContext{mp=" + mp +
+                        "}, x=" + analogSensor.getAngle() + "}";
+            else
+                return "MoveContext{mp=" + mp +
+                        ", ms={" + ms.getX() + ',' + ms.getV() + ',' + ms.getA() + ',' + ms.getJ() +
+                        "}, x=" + analogSensor.getAngle() + "}";
         }
     }
 
@@ -86,10 +92,18 @@ public class MultiPosMotorWithPotentiometer<P extends AngularPosition> extends D
         this.kF = kF;
 
         moveSM.repeat((state, moveContext) -> {
-            if (state.getTimeInState().seconds() > moveContext.mp.duration()) {
-                //Stop moving & engage brake
-                setPower(0.0);
-                state.next();
+            if (!moveContext.holdPosition && state.getTimeInState().seconds() > moveContext.mp.duration()) {
+//                if (moveContext.holdPosition) {
+//                    pidfController.setTargetPosition(moveContext.mp.end().getX());
+//                    pidfController.setTargetVelocity(0);
+//                    pidfController.setTargetAcceleration(0);
+//                    double power = pidfController.update(analogSensor.getAngle());
+//                    setPower(-power);
+//                } else {
+                    //Stop moving & engage brake
+                    setPower(0.0);
+                    state.next();
+//                }
             } else {
                 moveContext.ms = moveContext.mp.get(state.getTimeInState().seconds());
                 pidfController.setTargetPosition(moveContext.ms.getX());
@@ -111,17 +125,17 @@ public class MultiPosMotorWithPotentiometer<P extends AngularPosition> extends D
         pidfController.setInputBounds(0, 360);
     }
 
-    public void moveTo(P position, double maxVel, double maxAcc, double maxJerk) {
+    public void moveTo(P position, double maxVel, double maxAcc, double maxJerk, boolean holdPosition) {
         MotionProfile mp = MotionProfileGenerator.generateSimpleMotionProfile(
                 new MotionState(analogSensor.getAngle(), 0, 0),
                 new MotionState(position.getPosition(), 0, 0),
                 this.maxVel /* deg/s */, maxAccel /* deg/s/s */, this.maxJerk /* deg/s/s/s */);
-        runSM(moveSM, new MoveContext(mp, null));
+        runSM(moveSM, new MoveContext(mp, null, holdPosition));
         currentPosition = position;
     }
 
-    public void moveTo(P position) {
-        moveTo(position, this.maxVel, this.maxAccel, this.maxJerk);
+    public void moveTo(P position, boolean holdPosition) {
+        moveTo(position, this.maxVel, this.maxAccel, this.maxJerk, holdPosition);
     }
 
     public P getCurrentPos() {

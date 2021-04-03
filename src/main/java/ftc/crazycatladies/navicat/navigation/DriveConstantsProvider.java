@@ -2,12 +2,13 @@ package ftc.crazycatladies.navicat.navigation;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class DriveConstantsProvider {
     public static double TICKS_PER_REV;
     public static double MAX_RPM;
     public static boolean RUN_USING_ENCODER;
-    public static PIDCoefficients MOTOR_VELO_PID;
+    public static PIDFCoefficients MOTOR_VELO_PID;
     public static double WHEEL_RADIUS;
     public static double GEAR_RATIO;
     public static double TRACK_WIDTH;
@@ -32,7 +33,7 @@ public class DriveConstantsProvider {
             TICKS_PER_REV = driveConstants.getField("TICKS_PER_REV").getDouble(null);
             MAX_RPM = driveConstants.getField("MAX_RPM").getDouble(null);
             RUN_USING_ENCODER = driveConstants.getField("RUN_USING_ENCODER").getBoolean(null);
-            MOTOR_VELO_PID = (PIDCoefficients) driveConstants.getField("MOTOR_VELO_PID").get(null);
+            MOTOR_VELO_PID = (PIDFCoefficients) driveConstants.getField("MOTOR_VELO_PID").get(null);
             WHEEL_RADIUS = driveConstants.getField("WHEEL_RADIUS").getDouble(null);
             GEAR_RATIO = driveConstants.getField("GEAR_RATIO").getDouble(null);
             TRACK_WIDTH = driveConstants.getField("TRACK_WIDTH").getDouble(null);

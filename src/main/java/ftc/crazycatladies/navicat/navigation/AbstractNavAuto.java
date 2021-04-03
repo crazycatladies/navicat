@@ -34,4 +34,10 @@ public abstract class AbstractNavAuto extends AbstractAuto {
                 state.next();
         };
     }
+
+    @Override
+    protected void autoStop() {
+        super.autoStop();
+        navRobot.move(0, 0, 0);
+    }
 }

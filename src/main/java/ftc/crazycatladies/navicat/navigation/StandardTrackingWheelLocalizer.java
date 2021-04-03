@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +54,8 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelPeriodicIm
         this.imu = imu;
 
         // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
-//        rightEncoder.setDirection(Encoder.Direction.REVERSE);
+        leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        frontEncoder.setDirection(Encoder.Direction.REVERSE);
     }
 
     public static double encoderTicksToInches(double ticks) {

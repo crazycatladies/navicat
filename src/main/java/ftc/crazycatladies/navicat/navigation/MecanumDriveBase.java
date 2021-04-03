@@ -49,7 +49,7 @@ public class MecanumDriveBase extends MecanumDrive {
         }
 
         if (RUN_USING_ENCODER && MOTOR_VELO_PID != null) {
-            setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
+            setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, MOTOR_VELO_PID);
         }
     }
 
@@ -76,10 +76,10 @@ public class MecanumDriveBase extends MecanumDrive {
         return localization.getRadImuHeading();
     }
 
-    public void setPIDCoefficients(DcMotor.RunMode runMode, PIDCoefficients coefficients) {
+    public void setPIDFCoefficients(DcMotor.RunMode runMode, PIDFCoefficients coefficients) {
         for (DcMotorEx motor : motors) {
             motor.setPIDFCoefficients(runMode, new PIDFCoefficients(
-                    coefficients.kP, coefficients.kI, coefficients.kD, getMotorVelocityF()
+                    coefficients.p, coefficients.i, coefficients.d, coefficients.f
             ));
         }
     }
