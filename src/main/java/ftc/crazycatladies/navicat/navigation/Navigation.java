@@ -143,6 +143,13 @@ public class Navigation extends Subsystem {
     }
 
     @Override
+    public void start() {
+        super.start();
+        if (currentPose != null)
+            driveBase.setPoseEstimate(currentPose);
+    }
+
+    @Override
     public void loop(Map<Integer, LynxGetBulkInputDataResponse> bulkDataResponse) throws InterruptedException {
         lastError = null;
         // Loop children in order to update wheel positions, then update pose, then run SM

@@ -4,7 +4,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
-def navicatVersion = '0.5.15'
+def navicatVersion = '0.5.18'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -18,6 +18,7 @@ repositories {
     jcenter()
     mavenLocal()
     maven { url 'https://dl.bintray.com/crazycatladies/maven' }
+    maven { url = 'https://maven.brott.dev/' }
 }
 
 dependencies {
@@ -45,25 +46,6 @@ publishing {
     repositories {
         maven {
             url = "$buildDir/repo"
-        }
-    }
-}
-
-bintray {
-    user = findProperty("bintray.user")
-    key = findProperty("bintray.key")
-    publications = ['maven']
-
-    pkg {
-        repo = 'maven'
-        name = 'navicat'
-        userOrg = 'crazycatladies'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/crazycatladies/navicat'
-        version {
-            name = navicatVersion
-            desc = navicatVersion
-            released  = new Date()
         }
     }
 }
