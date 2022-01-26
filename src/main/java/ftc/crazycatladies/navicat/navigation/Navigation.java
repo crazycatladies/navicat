@@ -16,6 +16,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetBulkInputDataResponse;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -83,7 +84,7 @@ public class Navigation extends Subsystem {
                       PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                       MecanumDrive.DriveMotorConfig dmc,
                       String imu1, String imu2, List<Pose2d> trackingWheelPoses, Encoder leftEncoder,
-                      Encoder rightEncoder, Encoder middleEncoder) {
+                      Encoder rightEncoder, Encoder middleEncoder, double lateralMultiplier) {
         super("Navigation");
         DriveConstantsProvider.init(driveConstants);
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID);
@@ -93,7 +94,8 @@ public class Navigation extends Subsystem {
 
         drive = new MecanumDrive(dmc);
         driveBase = new MecanumDriveBase(drive.frontLeft, drive.backLeft, drive.backRight,
-                drive.frontRight, localization, trackingWheelPoses, leftEncoder, rightEncoder, middleEncoder);
+                drive.frontRight, localization, trackingWheelPoses,
+                leftEncoder, rightEncoder, middleEncoder, lateralMultiplier);
         subsystems.add(drive);
         constraints = new MecanumConstraints(BASE_CONSTRAINTS, TRACK_WIDTH);
 
@@ -145,6 +147,7 @@ public class Navigation extends Subsystem {
     @Override
     public void start() {
         super.start();
+        RobotLog.i("Navigation.start currentPose = " + currentPose);
         if (currentPose != null)
             driveBase.setPoseEstimate(currentPose);
     }

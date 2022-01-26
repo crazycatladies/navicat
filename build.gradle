@@ -4,7 +4,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
-def navicatVersion = '0.5.18'
+def navicatVersion = '0.6.1'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -24,10 +24,11 @@ repositories {
 dependencies {
     implementation files('libs/RobotCore.jar')
     implementation files('libs/Hardware.jar')
+    implementation files('libs/dashboard.jar')
     implementation('org.json:json:20190722')
     implementation 'com.acmerobotics.roadrunner:core:0.5.1'
-    implementation 'ftc.crazycatladies:schrodinger:0.2'
-    implementation 'ftc.crazycatladies:nyan:0.5.10'
+    implementation 'ftc.crazycatladies:schrodinger:0.3.3'
+    implementation 'ftc.crazycatladies:nyan:0.5.26'
     implementation 'org.apache.commons:commons-math3:3.6.1'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

@@ -14,20 +14,24 @@ public class NavRobot extends Subsystem {
     public NavRobot(boolean doLocalization, Class driveConstants,
                     PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                     MecanumDrive.DriveMotorConfig dmc,
-                    String imu1, String imu2) {
+                    String imu1, String imu2, double lateralMultiplier) {
         super("NavRobot");
         this.nav = new Navigation(doLocalization, driveConstants,
-                TRANSLATIONAL_PID, HEADING_PID, dmc, imu1, imu2, null, null, null, null);
+                TRANSLATIONAL_PID, HEADING_PID, dmc, imu1, imu2, null,
+                null, null, null, lateralMultiplier);
         subsystems.add(nav);
     }
 
     public NavRobot(boolean doLocalization, Class driveConstants,
                     PIDCoefficients TRANSLATIONAL_PID, PIDCoefficients HEADING_PID,
                     MecanumDrive.DriveMotorConfig dmc,
-                    String imu1, String imu2, List<Pose2d> trackingWheelPoses, Encoder leftEncoder, Encoder rightEncoder, Encoder middleEncoder) {
+                    String imu1, String imu2, List<Pose2d> trackingWheelPoses,
+                    Encoder leftEncoder, Encoder rightEncoder, Encoder middleEncoder,
+                    double lateralMultiplier) {
         super("NavRobot");
         this.nav = new Navigation(doLocalization, driveConstants,
-                TRANSLATIONAL_PID, HEADING_PID, dmc, imu1, imu2, trackingWheelPoses, leftEncoder, rightEncoder, middleEncoder);
+                TRANSLATIONAL_PID, HEADING_PID, dmc, imu1, imu2, trackingWheelPoses,
+                leftEncoder, rightEncoder, middleEncoder, lateralMultiplier);
         subsystems.add(nav);
         if (trackingWheelPoses != null) {
             addSubsystems(leftEncoder.getMotor(), rightEncoder.getMotor(), middleEncoder.getMotor());
