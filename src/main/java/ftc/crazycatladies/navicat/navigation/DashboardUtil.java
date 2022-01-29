@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package ftc.crazycatladies.navicat.navigation;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
