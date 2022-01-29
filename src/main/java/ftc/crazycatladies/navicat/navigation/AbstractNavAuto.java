@@ -56,7 +56,7 @@ public abstract class AbstractNavAuto extends AbstractAuto {
         TelemetryPacket packet = new TelemetryPacket();
         Canvas fieldOverlay = packet.fieldOverlay();
         fieldOverlay.setStroke("#3F51B5");
-        org.firstinspires.ftc.teamcode.DashboardUtil.drawRobot(fieldOverlay, navRobot.getNav().getCurrentPose());
+        DashboardUtil.drawRobot(fieldOverlay, navRobot.getNav().getCurrentPose());
         packet.put("pose", navRobot.getNav().getCurrentPose());
         dashboard.sendTelemetryPacket(packet);
     }
