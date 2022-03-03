@@ -4,7 +4,7 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
-def navicatVersion = '0.6.3'
+def navicatVersion = '0.6.22'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

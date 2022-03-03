@@ -6,18 +6,21 @@ import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.path.Path;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.trajectory.BaseTrajectoryBuilder;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryGenerator;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumConstraints;
 import com.acmerobotics.roadrunner.util.Angle;
 import com.qualcomm.hardware.lynx.commands.core.LynxGetBulkInputDataResponse;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -30,9 +33,12 @@ import ftc.crazycatladies.schrodinger.state.StateMachine;
 
 import static ftc.crazycatladies.navicat.navigation.DriveConstantsProvider.BASE_CONSTRAINTS;
 import static ftc.crazycatladies.navicat.navigation.DriveConstantsProvider.TRACK_WIDTH;
+import static java.lang.Math.abs;
+import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 
 public class Navigation extends Subsystem {
+
     static class TurnContext {
         double angle;
         MotionProfile profile;
@@ -67,11 +73,13 @@ public class Navigation extends Subsystem {
     private final StateMachine<Trajectory> followSM;
     private final StateMachine<TurnContext> turnSM;
     private final MecanumDrive drive;
-    private final MecanumDriveBase driveBase;
+    private MecanumDriveBase driveBase;
     private Localization localization;
     private final HolonomicPIDVAFollower follower;
+    Trajectory currentTrajectory;
 
     private Pose2d lastError;
+    private int slowMaxVel = 20;
 
     /**
      * Transfer between successive op modes using static
@@ -104,11 +112,13 @@ public class Navigation extends Subsystem {
 
         followSM = new StateMachine<Trajectory>("FollowTrajectory");
         followSM.once((state, trajectory) -> {
+            currentTrajectory = trajectory;
             follower.followTrajectory(trajectory);
         });
         followSM.repeat((state, trajectory) -> {
             if (!follower.isFollowing()) {
                 driveBase.setDriveSignal(new DriveSignal());
+                currentTrajectory = null;
                 state.next();
             } else {
                 driveBase.setDriveSignal(follower.update(currentPose));
@@ -185,6 +195,10 @@ public class Navigation extends Subsystem {
         return new TrajectoryBuilder(driveBase.getPoseEstimate(), constraints);
     }
 
+    public void followPath(Path path) {
+        followTrajectory(TrajectoryGenerator.INSTANCE.generateTrajectory(path, constraints));
+    }
+
     private TrajectoryBuilder reverseTrajectoryBuilder() {
         return new TrajectoryBuilder(driveBase.getPoseEstimate(), true, constraints);
     }
@@ -194,7 +208,12 @@ public class Navigation extends Subsystem {
     }
 
     public void setPoseEstimate(double x, double y, double heading) {
-        driveBase.setPoseEstimate(new Pose2d(x, y, toRadians(heading)));
+        setPoseEstimate(new Pose2d(x, y, toRadians(heading)));
+    }
+
+    public void setPoseEstimate(Pose2d pose) {
+        driveBase.setPoseEstimate(pose);
+        currentPose = pose;
     }
 
     @Override
@@ -221,7 +240,7 @@ public class Navigation extends Subsystem {
         return trajectoryBuilder().lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), constraints);
     }
     public BaseTrajectoryBuilder slowTo(double x, double y, double heading) {
-        return trajectoryBuilder(20).lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), maxVelConstraints(20));
+        return trajectoryBuilder(slowMaxVel).lineToLinearHeading(new Pose2d(x, y, toRadians(heading)), maxVelConstraints(20));
     }
     public BaseTrajectoryBuilder splineTo(double x, double y, double heading) {
         return trajectoryBuilder().splineTo(new Vector2d(x, y), toRadians(heading), constraints);
@@ -242,5 +261,34 @@ public class Navigation extends Subsystem {
 
     public MecanumDriveBase getDriveBase() {
         return driveBase;
+    }
+
+    public int getSlowMaxVel() {
+        return slowMaxVel;
+    }
+
+    public void setSlowMaxVel(int slowMaxVel) {
+        this.slowMaxVel = slowMaxVel;
+    }
+
+    public void stopNavigating() {
+        if (currentSM != null)
+            currentSM.stop();
+    }
+
+    public double distTo(Vector2d vec) {
+        return getCurrentPose().vec().distTo(vec);
+    }
+
+    public double angleDelta(double angleInDegrees) {
+        return abs(AngleUnit.normalizeDegrees(toDegrees(getCurrentPose().getHeading()) - angleInDegrees));
+    }
+
+    public void setDriveBase(MecanumDriveBase driveBase) {
+        this.driveBase = driveBase;
+    }
+
+    public Trajectory getCurrentTrajectory() {
+        return currentTrajectory;
     }
 }

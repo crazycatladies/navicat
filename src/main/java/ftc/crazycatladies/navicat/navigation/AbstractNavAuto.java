@@ -3,7 +3,6 @@ package ftc.crazycatladies.navicat.navigation;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.BaseTrajectoryBuilder;
 
 import ftc.crazycatladies.nyan.auto.AbstractAuto;
@@ -13,6 +12,8 @@ import ftc.crazycatladies.schrodinger.state.StateFunction;
 public abstract class AbstractNavAuto extends AbstractAuto {
     protected NavRobot navRobot;
     protected FtcDashboard dashboard = FtcDashboard.getInstance();
+    protected double robotWidth = 8;
+    protected double robotLength = 14;
 
     public AbstractNavAuto() {
         super();
@@ -56,7 +57,7 @@ public abstract class AbstractNavAuto extends AbstractAuto {
         TelemetryPacket packet = new TelemetryPacket();
         Canvas fieldOverlay = packet.fieldOverlay();
         fieldOverlay.setStroke("#3F51B5");
-        DashboardUtil.drawRobot(fieldOverlay, navRobot.getNav().getCurrentPose());
+        DashboardUtil.drawRobot(fieldOverlay, navRobot.getNav().getCurrentPose(), robotWidth, robotLength);
         packet.put("pose", navRobot.getNav().getCurrentPose());
         dashboard.sendTelemetryPacket(packet);
     }
